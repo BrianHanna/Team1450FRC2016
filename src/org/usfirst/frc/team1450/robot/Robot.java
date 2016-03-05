@@ -83,6 +83,8 @@ public class Robot extends IterativeRobot {
 		chooser.addObject("Drive Backwards", new DriveBackwards());
 		camServoY = new Servo(1);
 		camServoX = new Servo(0);
+		camServoX.set(0.5);
+		camServoY.set(0.5);
 		SmartDashboard.putData("Auto mode", chooser);
 	}
 
@@ -149,8 +151,13 @@ public class Robot extends IterativeRobot {
 	double lowPassFilteredSpeed = 0.0;
 	double camXFiltered = 0.0;
 	double camYFiltered = 0.0;
+<<<<<<< HEAD
 	double camXPos = 0.5;
 	double camYPos = 0.5;
+=======
+	double camXPosition=0.5;
+	double camYPosition=0.5;
+>>>>>>> origin/spiderMansDev
 	
 	/**
 	 * This function is called periodically during operator control
@@ -172,6 +179,7 @@ public class Robot extends IterativeRobot {
 		lowPassFilteredSpeed += (oi.controller1.getY(Hand.kLeft) - lowPassFilteredSpeed) * 0.3;
 		camXFiltered += ((oi.controller2.getRawAxis(RobotMap.xBoxLeftX)*-1) - camXFiltered) * 0.3;
 		camYFiltered += (oi.controller2.getRawAxis(RobotMap.xBoxLeftY) - camYFiltered) * 0.3;
+<<<<<<< HEAD
 		if ((camXFiltered > 0.1) || (camXFiltered < -0.1))
 		{
 			camXPos += camXFiltered * 0.1;
@@ -179,12 +187,36 @@ public class Robot extends IterativeRobot {
 		if ((camYFiltered > 0.1) || (camYFiltered < -0.1))
 		{
 			camYPos += camYFiltered * 0.1;
+=======
+		camXPosition += camXFiltered/10;
+		camYPosition += camYFiltered/10;
+		if (camXPosition > 1)
+		{
+			camXPosition=1;
+		}
+		if (camXPosition < -1)
+		{
+			camXPosition=-1;
+		}
+		if (camYPosition > 1)
+		{
+			camYPosition=1;
+		}
+		if (camYPosition < -1)
+		{
+			camYPosition=-1;
+>>>>>>> origin/spiderMansDev
 		}
 		//drives.ArcadeDrive(lowPassFilteredSpeed, oi.controller1.getX(Hand.kLeft));	//drives with lowPassFilter
 		drives.ArcadeDrive(oi.controller1.getY(Hand.kLeft), oi.controller1.getX(Hand.kLeft));
 		tower.Move(oi.controller1.getRawAxis(RobotMap.xBoxRightY));
+<<<<<<< HEAD
 		camServoX.set(camXPos);
     	camServoY.set(camYPos);
+=======
+		camServoX.set(camXPosition);
+    	camServoY.set(camYPosition);
+>>>>>>> origin/spiderMansDev
 	}
 
 	/**
