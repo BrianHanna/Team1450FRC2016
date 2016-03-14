@@ -6,49 +6,35 @@ import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class Feeder extends Subsystem {
-	CANTalon feederMotor1;
-	CANTalon feederMotor2;
+	CANTalon feederMotor;
 	
 	public void Init() {
-		if (feederMotor1 == null)
+		if (feederMotor == null)
 		{
-			feederMotor1 = new CANTalon(RobotMap.feederMotor1);
-			feederMotor1.ConfigFwdLimitSwitchNormallyOpen(true);
-			feederMotor1.ConfigRevLimitSwitchNormallyOpen(true);
-			feederMotor1.enableBrakeMode(true);
-			feederMotor1.enableLimitSwitch(true, true);
-//			feederMotor1.reverseOutput(false);	//closed loop method
-			feederMotor1.setInverted(false);
-		}
-		if (feederMotor2 == null)
-		{
-			feederMotor2 = new CANTalon(RobotMap.feederMotor2);
-			feederMotor2.ConfigFwdLimitSwitchNormallyOpen(true);
-			feederMotor2.ConfigRevLimitSwitchNormallyOpen(true);
-			feederMotor2.enableBrakeMode(true);
-			feederMotor2.enableLimitSwitch(true, true);
-//			feederMotor2.reverseOutput(true);	//closed loop method
-			feederMotor2.setInverted(true);
+			feederMotor = new CANTalon(RobotMap.feederMotor);
+			feederMotor.ConfigFwdLimitSwitchNormallyOpen(true);
+			feederMotor.ConfigRevLimitSwitchNormallyOpen(true);
+			feederMotor.enableBrakeMode(true);
+			feederMotor.enableLimitSwitch(false, false);
+//			feederMotor.reverseOutput(false);	//closed loop method
+			feederMotor.setInverted(false);
 		}
 		Off();
 	}
 	
 	public void Feed()
 	{
-		feederMotor1.set(1.0);
-		feederMotor2.set(1.0);
+		feederMotor.set(1.0);
 	}
 	
 	public void Release()
 	{
-		feederMotor1.set(-1.0);
-		feederMotor2.set(-1.0);
+		feederMotor.set(-1.0);
 	}
 	
 	public void Off()
 	{
-		feederMotor1.set(0.0);
-		feederMotor2.set(0.0);
+		feederMotor.set(0.0);
 	}
 
 	@Override

@@ -10,12 +10,11 @@ public class RobotMap {
     // following variables to use with your drivetrain subsystem.
 	public static int leftDrive=10;
     public static int rightDrive=11;
-    public static int leftArmMotor=12;
-    public static int rightArmMotor=13;
-    public static int leftTowerMotor=14;
-    public static int rightTowerMotor=15;
-	public static int feederMotor1 = 16;
-	public static int feederMotor2 = 17;
+    public static int leftArmMotor=15;		//15 = right left side
+    public static int rightArmMotor=14;		//14 = left right side
+    public static int leftTowerMotor=16;	//16 = left left side
+    public static int rightTowerMotor=13;	//13 = right right side
+	public static int feederMotor = 12;		//12 = middle right side
 	public static int xBoxLeftX = 0;
 	public static int xBoxLeftY = 1;
 	public static int xBoxLeftTrigger = 2;
@@ -27,4 +26,10 @@ public class RobotMap {
     // number and the module. For example you with a rangefinder:
     // public static int rangefinderPort = 1;
     // public static int rangefinderModule = 1;
+	public static int rightTowerHomeSwitch = 0;
+	public static int leftTowerHomeSwitch = 5;
+	public static int rightArmDownSwitch = 1;
+	public static int rightArmUpSwitch = 2;
+	public static int leftArmDownSwitch = 3;
+	public static int leftArmUpSwitch = 4;
 }

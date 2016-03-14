@@ -34,23 +34,33 @@ public class ArmControl extends Subsystem {
 //			rightArmMotor.reverseOutput(true);	//closed loop method
 			rightArmMotor.setInverted(true);
 		}
-		OffCommand();
+		LeftOffCommand();
+		RightOffCommand();
 	}
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 
-    public void UpCommand() {
-        leftArmMotor.set(1.0);
-        rightArmMotor.set(1.0);
+    public void LeftUpCommand() {
+        leftArmMotor.set(0.5);
     }
     
-    public void DownCommand() {
-    	leftArmMotor.set(-1.0);
-    	rightArmMotor.set(-1.0);
+    public void LeftDownCommand() {
+    	leftArmMotor.set(-0.5);
     }
     
-    public void OffCommand() {
+    public void LeftOffCommand() {
     	leftArmMotor.set(0.0);
+    }
+    
+    public void RightUpCommand() {
+        rightArmMotor.set(0.5);
+    }
+    
+    public void RightDownCommand() {
+    	rightArmMotor.set(-0.5);
+    }
+    
+    public void RightOffCommand() {
     	rightArmMotor.set(0.0);
     }
 

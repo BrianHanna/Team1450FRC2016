@@ -17,7 +17,7 @@ public class Tower extends Subsystem {
 			leftTowerMotor.ConfigFwdLimitSwitchNormallyOpen(true);
 			leftTowerMotor.ConfigRevLimitSwitchNormallyOpen(true);
 			leftTowerMotor.enableBrakeMode(true);
-			leftTowerMotor.enableLimitSwitch(true, true);
+			leftTowerMotor.enableLimitSwitch(false, false);
 //			leftTowerMotor.reverseOutput(false);	//closed loop method
 			leftTowerMotor.setInverted(false);
 		}
@@ -27,18 +27,55 @@ public class Tower extends Subsystem {
 			rightTowerMotor.ConfigFwdLimitSwitchNormallyOpen(true);
 			rightTowerMotor.ConfigRevLimitSwitchNormallyOpen(true);
 			rightTowerMotor.enableBrakeMode(true);
-			rightTowerMotor.enableLimitSwitch(true, true);
+			rightTowerMotor.enableLimitSwitch(false, false);
 //			rightTowerMotor.reverseOutput(true);	//closed loop method
 			rightTowerMotor.setInverted(true);
 		}
 		Off();
 	}
 	
-	public void Move(double setPoint)
+	public void GetMotorStatus(boolean leftSwitch, boolean rightSwitch)
 	{
-		leftTowerMotor.set(setPoint);
-		rightTowerMotor.set(setPoint);
-		SmartDashboard.putNumber("towerOut", setPoint);
+		if (leftSwitch)
+		{
+			leftTowerMotor.setEncPosition(0);
+		}
+		if (rightSwitch)
+		{
+			rightTowerMotor.setEncPosition(0);
+		}
+		SmartDashboard.putNumber("leftTowerPos", leftTowerMotor.getEncPosition());
+		SmartDashboard.putNumber("rightTowerPos", rightTowerMotor.getEncPosition());
+	}
+	
+	public void Move(double leftOut, double rightOut)
+	{
+		if ((leftOut < 0.2) && (leftOut > -0.2))
+		{
+			leftOut = 0.0;
+		}
+		if (leftOut < 0)
+		{
+			if (leftTowerMotor.getEncPosition() > 400000)
+			{
+				leftOut = 0.0;
+			}
+		}
+		if (rightOut < 0)
+		{
+			if (rightTowerMotor.getEncPosition() > 400000)
+			{
+				rightOut = 0.0;
+			}
+		}
+		leftOut = leftOut * SmartDashboard.getNumber("TowerSpeed%") / 100; 
+		leftTowerMotor.set(leftOut);
+		if ((rightOut < 0.2) && (rightOut > -0.2))
+		{
+			rightOut = 0.0;
+		}
+		rightOut = rightOut * SmartDashboard.getNumber("TowerSpeed%") / 100;
+		rightTowerMotor.set(rightOut);
 	}
 	
 	public void Up()

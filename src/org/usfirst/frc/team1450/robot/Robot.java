@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 import org.usfirst.frc.team1450.robot.commands.DriveBackwards;
 import org.usfirst.frc.team1450.robot.commands.DriveForward;
@@ -44,7 +45,12 @@ public class Robot extends IterativeRobot {
 	ADXRS450_Gyro gyro;
 	Servo camServoY;
 	Servo camServoX;
-
+	DigitalInput leftTowerDown;
+	DigitalInput rightTowerDown;
+	DigitalInput leftArmDown;
+	DigitalInput leftArmUp;
+	DigitalInput rightArmDown;
+	DigitalInput rightArmUp;
 	Command autonomousCommand;
 	SendableChooser chooser;
 
@@ -58,6 +64,12 @@ public class Robot extends IterativeRobot {
 		drives.Init();
 		tower.Init();
 		feeder.Init();
+		leftTowerDown = new DigitalInput(RobotMap.leftTowerHomeSwitch);
+		rightTowerDown = new DigitalInput(RobotMap.rightTowerHomeSwitch);
+		leftArmDown = new DigitalInput(RobotMap.leftArmDownSwitch);
+		leftArmUp = new DigitalInput(RobotMap.leftArmUpSwitch);
+		rightArmDown = new DigitalInput(RobotMap.rightArmDownSwitch);
+		rightArmUp = new DigitalInput(RobotMap.rightArmUpSwitch);
 		oi.aButton1.whileHeld(new FeedBoulder());
 		oi.aButton1.whenReleased(new FeederOff());
 		oi.bButton1.whileHeld(new ReleaseBoulder());
@@ -87,6 +99,7 @@ public class Robot extends IterativeRobot {
 		camServoY.set(0.5);
 		SmartDashboard.putData("Auto mode", chooser);
 		SmartDashboard.putNumber("MaxDriveSpeed%", 100);
+		SmartDashboard.putNumber("TowerSpeed%", 100);
 	}
 
 	/**
@@ -162,14 +175,50 @@ public class Robot extends IterativeRobot {
 		Scheduler.getInstance().run();
 		SmartDashboard.putNumber("POV", oi.controller1.getPOV());
 		SmartDashboard.putNumber("GyroAngle", gyro.getAngle());
-		drives.GetDriveMotorStats();
+		SmartDashboard.putBoolean("leftTowerDown", leftTowerDown.get());
+		SmartDashboard.putBoolean("rightTowerDown", rightTowerDown.get());
+		SmartDashboard.putBoolean("leftArmDown", leftArmDown.get());
+		SmartDashboard.putBoolean("leftArmUp", leftArmUp.get());
+		SmartDashboard.putBoolean("rightArmDown", rightArmDown.get());
+		SmartDashboard.putBoolean("rightArmUp", rightArmUp.get());
 		if (oi.controller1.getPOV() == 0.0) {
-			armControl.UpCommand();
+			if (!leftArmUp.get())
+			{
+				armControl.LeftOffCommand();
+			}
+			else
+			{
+				armControl.LeftUpCommand();
+			}
+			if (!rightArmUp.get())
+			{
+				armControl.RightOffCommand();
+			}
+			else
+			{
+				armControl.RightUpCommand();
+			}
 		} else {
 			if (oi.controller1.getPOV() == 180.0) {
-				armControl.DownCommand();
+				if (!leftArmDown.get())
+				{
+					armControl.LeftOffCommand();
+				}
+				else
+				{
+					armControl.LeftDownCommand();
+				}
+				if (!rightArmDown.get())
+				{
+					armControl.RightOffCommand();
+				}
+				else
+				{
+					armControl.RightDownCommand();
+				}
 			} else {
-				armControl.OffCommand();
+				armControl.LeftOffCommand();
+				armControl.RightOffCommand();
 			}
 		}
 		lowPassFilteredSpeed += (oi.controller1.getY(Hand.kLeft) - lowPassFilteredSpeed) * 0.3;
@@ -211,7 +260,23 @@ public class Robot extends IterativeRobot {
 		}
 		maxDriveSpeed = maxDriveSpeed / 100;
 		drives.ArcadeDrive(oi.controller1.getY(Hand.kLeft) * maxDriveSpeed, oi.controller1.getX(Hand.kLeft));
-		tower.Move(oi.controller1.getRawAxis(RobotMap.xBoxRightY));
+		tower.GetMotorStatus(!leftTowerDown.get(), !rightTowerDown.get());
+		SmartDashboard.putNumber("TowerMove", oi.controller1.getRawAxis(RobotMap.xBoxRightY));
+		double leftOut, rightOut;
+		leftOut = oi.controller1.getRawAxis(RobotMap.xBoxRightY);
+		rightOut = oi.controller1.getRawAxis(RobotMap.xBoxRightY);
+		if (oi.controller1.getRawAxis(RobotMap.xBoxRightY) > 0 )
+		{
+			if (!leftTowerDown.get())
+			{
+				leftOut = 0;
+			}
+			if (!rightTowerDown.get())
+			{
+				rightOut = 0;
+			}
+		}
+		tower.Move(leftOut, rightOut);
 		camServoX.set(camXPosition);
     	camServoY.set(camYPosition);
 	}
