@@ -173,7 +173,6 @@ public class Robot extends IterativeRobot {
 	 */
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-		SmartDashboard.putNumber("POV", oi.controller1.getPOV());
 		SmartDashboard.putNumber("GyroAngle", gyro.getAngle());
 		SmartDashboard.putBoolean("leftTowerDown", leftTowerDown.get());
 		SmartDashboard.putBoolean("rightTowerDown", rightTowerDown.get());
@@ -181,14 +180,14 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putBoolean("leftArmUp", leftArmUp.get());
 		SmartDashboard.putBoolean("rightArmDown", rightArmDown.get());
 		SmartDashboard.putBoolean("rightArmUp", rightArmUp.get());
-		if (oi.controller1.getPOV() == 0.0) {
+		if (oi.controller2.getRawAxis(RobotMap.xBoxLeftY) < -0.2) {
 			if (!leftArmUp.get())
 			{
 				armControl.LeftOffCommand();
 			}
 			else
 			{
-				armControl.LeftUpCommand();
+				armControl.LeftUpCommand(oi.controller2.getRawAxis(RobotMap.xBoxLeftY) * 0.5);
 			}
 			if (!rightArmUp.get())
 			{
@@ -196,17 +195,17 @@ public class Robot extends IterativeRobot {
 			}
 			else
 			{
-				armControl.RightUpCommand();
+				armControl.RightUpCommand(oi.controller2.getRawAxis(RobotMap.xBoxLeftY) * 0.5);
 			}
 		} else {
-			if (oi.controller1.getPOV() == 180.0) {
+			if (oi.controller2.getRawAxis(RobotMap.xBoxLeftY) > 0.2) {
 				if (!leftArmDown.get())
 				{
 					armControl.LeftOffCommand();
 				}
 				else
 				{
-					armControl.LeftDownCommand();
+					armControl.LeftDownCommand(oi.controller2.getRawAxis(RobotMap.xBoxLeftY) * 0.5);
 				}
 				if (!rightArmDown.get())
 				{
@@ -214,7 +213,7 @@ public class Robot extends IterativeRobot {
 				}
 				else
 				{
-					armControl.RightDownCommand();
+					armControl.RightDownCommand(oi.controller2.getRawAxis(RobotMap.xBoxLeftY) * 0.5);
 				}
 			} else {
 				armControl.LeftOffCommand();
@@ -222,15 +221,15 @@ public class Robot extends IterativeRobot {
 			}
 		}
 		lowPassFilteredSpeed += (oi.controller1.getY(Hand.kLeft) - lowPassFilteredSpeed) * 0.3;
-		camXFiltered += ((oi.controller2.getRawAxis(RobotMap.xBoxLeftX)*-1) - camXFiltered) * 0.3;
-		camYFiltered += (oi.controller2.getRawAxis(RobotMap.xBoxLeftY) - camYFiltered) * 0.3;
-		if ((camXFiltered > 0.1) || (camXFiltered < -0.1))
+		camXFiltered += ((oi.controller1.getRawAxis(RobotMap.xBoxRightX)*1) - camXFiltered) * 0.3;
+		camYFiltered += (oi.controller1.getRawAxis(RobotMap.xBoxRightY) - camYFiltered) * 0.3;
+		if (((oi.controller1.getRawAxis(RobotMap.xBoxRightX)*-1) > 0.1) || ((oi.controller1.getRawAxis(RobotMap.xBoxRightX)*-1) < -0.1))
 		{
-			camXPosition += camXFiltered * 0.1;
+			camXPosition += (oi.controller1.getRawAxis(RobotMap.xBoxRightX)*-1) * 0.01;
 		}
-		if ((camYFiltered > 0.1) || (camYFiltered < -0.1))
+		if ((oi.controller1.getRawAxis(RobotMap.xBoxRightY) > 0.1) || (oi.controller1.getRawAxis(RobotMap.xBoxRightY) < -0.1))
 		{
-			camYPosition += camYFiltered * 0.1;
+			camYPosition += oi.controller1.getRawAxis(RobotMap.xBoxRightY) * 0.01;
 		}
 		if (camXPosition > 1)
 		{
@@ -248,6 +247,8 @@ public class Robot extends IterativeRobot {
 		{
 			camYPosition=-1;
 		}
+		SmartDashboard.putNumber("CamX", camXPosition);
+		SmartDashboard.putNumber("CamY", camYPosition);
 		//drives.ArcadeDrive(lowPassFilteredSpeed, oi.controller1.getX(Hand.kLeft));	//drives with lowPassFilter
 		double maxDriveSpeed = SmartDashboard.getNumber("MaxDriveSpeed%");
 		if (maxDriveSpeed > 100)
@@ -261,11 +262,13 @@ public class Robot extends IterativeRobot {
 		maxDriveSpeed = maxDriveSpeed / 100;
 		drives.ArcadeDrive(oi.controller1.getY(Hand.kLeft) * maxDriveSpeed, oi.controller1.getX(Hand.kLeft));
 		tower.GetMotorStatus(!leftTowerDown.get(), !rightTowerDown.get());
-		SmartDashboard.putNumber("TowerMove", oi.controller1.getRawAxis(RobotMap.xBoxRightY));
 		double leftOut, rightOut;
-		leftOut = oi.controller1.getRawAxis(RobotMap.xBoxRightY);
-		rightOut = oi.controller1.getRawAxis(RobotMap.xBoxRightY);
-		if (oi.controller1.getRawAxis(RobotMap.xBoxRightY) > 0 )
+		leftOut = oi.controller2.getRawAxis(RobotMap.xBoxRightY);
+		rightOut = oi.controller2.getRawAxis(RobotMap.xBoxRightY);
+		SmartDashboard.putBoolean("LeftTowerDown", !leftTowerDown.get());
+		SmartDashboard.putBoolean("LeftTowerDown", !leftTowerDown.get());
+		SmartDashboard.putNumber("TowerMove", oi.controller2.getRawAxis(RobotMap.xBoxRightY));
+		if (oi.controller2.getRawAxis(RobotMap.xBoxRightY) > 0 )
 		{
 			if (!leftTowerDown.get())
 			{
@@ -277,7 +280,7 @@ public class Robot extends IterativeRobot {
 			}
 		}
 		tower.Move(leftOut, rightOut);
-		camServoX.set(camXPosition);
+		camServoX.set(-camXPosition);
     	camServoY.set(camYPosition);
 	}
 

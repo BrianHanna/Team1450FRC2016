@@ -22,7 +22,7 @@ public class ArmControl extends Subsystem {
 			leftArmMotor.enableBrakeMode(true);
 			leftArmMotor.enableLimitSwitch(true, true);
 //			leftArmMotor.reverseOutput(false);	//closed loop method
-			leftArmMotor.setInverted(false);
+			leftArmMotor.setInverted(true);
 		}
 		if (rightArmMotor == null)
 		{
@@ -32,7 +32,7 @@ public class ArmControl extends Subsystem {
 			rightArmMotor.enableBrakeMode(true);
 			rightArmMotor.enableLimitSwitch(true, true);
 //			rightArmMotor.reverseOutput(true);	//closed loop method
-			rightArmMotor.setInverted(true);
+			rightArmMotor.setInverted(false);
 		}
 		LeftOffCommand();
 		RightOffCommand();
@@ -40,24 +40,24 @@ public class ArmControl extends Subsystem {
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 
-    public void LeftUpCommand() {
-        leftArmMotor.set(0.5);
+    public void LeftUpCommand(double leftOut) {
+        leftArmMotor.set(leftOut);
     }
     
-    public void LeftDownCommand() {
-    	leftArmMotor.set(-0.5);
+    public void LeftDownCommand(double leftOut) {
+    	leftArmMotor.set(leftOut);
     }
     
     public void LeftOffCommand() {
     	leftArmMotor.set(0.0);
     }
     
-    public void RightUpCommand() {
-        rightArmMotor.set(0.5);
+    public void RightUpCommand(double rightOut) {
+        rightArmMotor.set(rightOut);
     }
     
-    public void RightDownCommand() {
-    	rightArmMotor.set(-0.5);
+    public void RightDownCommand(double rightOut) {
+    	rightArmMotor.set(rightOut);
     }
     
     public void RightOffCommand() {
