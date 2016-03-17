@@ -165,8 +165,8 @@ public class Robot extends IterativeRobot {
 	double lowPassFilteredSpeed = 0.0;
 	double camXFiltered = 0.0;
 	double camYFiltered = 0.0;
-	double camXPosition=0.5;
-	double camYPosition=0.5;
+	double camXPosition=-0.197;
+	double camYPosition=0.765;
 	
 	/**
 	 * This function is called periodically during operator control
@@ -223,11 +223,11 @@ public class Robot extends IterativeRobot {
 		lowPassFilteredSpeed += (oi.controller1.getY(Hand.kLeft) - lowPassFilteredSpeed) * 0.3;
 		camXFiltered += ((oi.controller1.getRawAxis(RobotMap.xBoxRightX)*1) - camXFiltered) * 0.3;
 		camYFiltered += (oi.controller1.getRawAxis(RobotMap.xBoxRightY) - camYFiltered) * 0.3;
-		if (((oi.controller1.getRawAxis(RobotMap.xBoxRightX)*-1) > 0.1) || ((oi.controller1.getRawAxis(RobotMap.xBoxRightX)*-1) < -0.1))
+		if (((oi.controller1.getRawAxis(RobotMap.xBoxRightX)*-1) > 0.5) || ((oi.controller1.getRawAxis(RobotMap.xBoxRightX)*-1) < -0.5))
 		{
 			camXPosition += (oi.controller1.getRawAxis(RobotMap.xBoxRightX)*-1) * 0.01;
 		}
-		if ((oi.controller1.getRawAxis(RobotMap.xBoxRightY) > 0.1) || (oi.controller1.getRawAxis(RobotMap.xBoxRightY) < -0.1))
+		if ((oi.controller1.getRawAxis(RobotMap.xBoxRightY) > 0.2) || (oi.controller1.getRawAxis(RobotMap.xBoxRightY) < -0.2))
 		{
 			camYPosition += oi.controller1.getRawAxis(RobotMap.xBoxRightY) * 0.01;
 		}
