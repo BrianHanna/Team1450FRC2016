@@ -82,14 +82,14 @@ public class Tower extends Subsystem {
 		}
 		if (leftOut < 0)
 		{
-			if (leftTowerMotor.getEncPosition() > 500000)
+			if (leftTowerMotor.getEncPosition() > 477000)
 			{
 				leftOut = 0.0;
 			}
 		}
 		if (rightOut < 0)
 		{
-			if (rightTowerMotor.getEncPosition() > 500000)
+			if (rightTowerMotor.getEncPosition() > 477000)
 			{
 				rightOut = 0.0;
 			}

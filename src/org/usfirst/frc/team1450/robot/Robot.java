@@ -12,9 +12,9 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.DigitalInput;
 
-import org.usfirst.frc.team1450.robot.commands.DriveBackwards;
 import org.usfirst.frc.team1450.robot.commands.DriveForward;
 import org.usfirst.frc.team1450.robot.commands.ExampleCommand;
+import org.usfirst.frc.team1450.robot.commands.AutoShootBall;
 import org.usfirst.frc.team1450.robot.commands.ReleaseBoulder;
 import org.usfirst.frc.team1450.robot.commands.FeedBoulder;
 import org.usfirst.frc.team1450.robot.commands.FeederOff;
@@ -75,7 +75,7 @@ public class Robot extends IterativeRobot {
 		oi.bButton1.whileHeld(new ReleaseBoulder());
 		oi.bButton1.whenReleased(new FeederOff());
 		chooser = new SendableChooser();
-		chooser.addDefault("Default Auto", new ExampleCommand());
+		chooser.addDefault("Drive Forward", new DriveForward());
 		c = new Compressor(1);
 		c.setClosedLoopControl(true);
 		c.start();
@@ -91,15 +91,17 @@ public class Robot extends IterativeRobot {
         	//
         }
         gyro = new ADXRS450_Gyro();
-		chooser.addObject("Drive Forward", new DriveForward());
-		chooser.addObject("Drive Backwards", new DriveBackwards());
+        chooser.addObject("Shoot Boulder Autonomous", new AutoShootBall());
+		chooser.addObject("Do nothing", new ExampleCommand());
 		camServoY = new Servo(1);
 		camServoX = new Servo(0);
-		camServoX.set(0.5);
-		camServoY.set(0.5);
+		camServoX.set(-0.025);
+		camServoY.set(0.855);
 		SmartDashboard.putData("Auto mode", chooser);
-		SmartDashboard.putNumber("MaxDriveSpeed%", 100);
+		SmartDashboard.putNumber("MaxDriveSpeed%", 95);
 		SmartDashboard.putNumber("TowerSpeed%", 100);
+		SmartDashboard.putNumber("AutoDriveSpeed%", 95);
+		SmartDashboard.putNumber("AutoDriveDistance", 17 * 12);
 	}
 
 	/**
@@ -128,6 +130,7 @@ public class Robot extends IterativeRobot {
 	 */
 	public void autonomousInit() {
 		autonomousCommand = (Command) chooser.getSelected();
+		
 
 //		String autoSelected = SmartDashboard.getString("Auto Selector", "Drive Forward");
 //		switch (autoSelected) {
@@ -174,12 +177,13 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
 		SmartDashboard.putNumber("GyroAngle", gyro.getAngle());
-		SmartDashboard.putBoolean("leftTowerDown", leftTowerDown.get());
-		SmartDashboard.putBoolean("rightTowerDown", rightTowerDown.get());
-		SmartDashboard.putBoolean("leftArmDown", leftArmDown.get());
-		SmartDashboard.putBoolean("leftArmUp", leftArmUp.get());
-		SmartDashboard.putBoolean("rightArmDown", rightArmDown.get());
-		SmartDashboard.putBoolean("rightArmUp", rightArmUp.get());
+//		SmartDashboard.putBoolean("leftTowerDown", leftTowerDown.get());
+//		SmartDashboard.putBoolean("rightTowerDown", rightTowerDown.get());
+//		SmartDashboard.putBoolean("leftArmDown", leftArmDown.get());
+//		SmartDashboard.putBoolean("leftArmUp", leftArmUp.get());
+//		SmartDashboard.putBoolean("rightArmDown", rightArmDown.get());
+//		SmartDashboard.putBoolean("rightArmUp", rightArmUp.get());
+		drives.GetDriveMotorStats();
 		if (oi.controller2.getRawAxis(RobotMap.xBoxLeftY) < -0.2) {
 			if (!leftArmUp.get())
 			{
@@ -220,7 +224,6 @@ public class Robot extends IterativeRobot {
 				armControl.RightOffCommand();
 			}
 		}
-		lowPassFilteredSpeed += (oi.controller1.getY(Hand.kLeft) - lowPassFilteredSpeed) * 0.3;
 		camXFiltered += ((oi.controller1.getRawAxis(RobotMap.xBoxRightX)*1) - camXFiltered) * 0.3;
 		camYFiltered += (oi.controller1.getRawAxis(RobotMap.xBoxRightY) - camYFiltered) * 0.3;
 		if (((oi.controller1.getRawAxis(RobotMap.xBoxRightX)*-1) > 0.5) || ((oi.controller1.getRawAxis(RobotMap.xBoxRightX)*-1) < -0.5))
@@ -260,7 +263,15 @@ public class Robot extends IterativeRobot {
 			maxDriveSpeed = 0;
 		}
 		maxDriveSpeed = maxDriveSpeed / 100;
-		drives.ArcadeDrive(oi.controller1.getY(Hand.kLeft) * maxDriveSpeed, oi.controller1.getX(Hand.kLeft));
+		double driveCommand = Math.sqrt((oi.controller1.getY(Hand.kLeft) * oi.controller1.getY(Hand.kLeft)) + (oi.controller1.getX(Hand.kLeft) * oi.controller1.getX(Hand.kLeft)));
+		if (oi.controller1.getY(Hand.kLeft) <= 0)
+		{
+			driveCommand = -driveCommand;
+		}
+		// to revert replace /*driveCommand*/ with /*oi.controller1.getY(Hand.kLeft)*/
+		driveCommand = oi.controller1.getY(Hand.kLeft);
+		lowPassFilteredSpeed += (driveCommand - lowPassFilteredSpeed) * 0.3;
+		drives.ArcadeDrive(driveCommand * maxDriveSpeed, oi.controller1.getX(Hand.kLeft));
 		tower.GetMotorStatus(!leftTowerDown.get(), !rightTowerDown.get());
 		double leftOut, rightOut;
 		leftOut = oi.controller2.getRawAxis(RobotMap.xBoxRightY);

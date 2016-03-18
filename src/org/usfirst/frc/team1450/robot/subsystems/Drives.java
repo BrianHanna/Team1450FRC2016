@@ -22,6 +22,7 @@ public class Drives extends Subsystem {
 			leftDrive.enableBrakeMode(true);
 			leftDrive.reverseOutput(false);	//closed loop method
 			leftDrive.setInverted(false);
+			leftDrive.setEncPosition(0);
 		}
 		if (rightDrive == null)
 		{
@@ -29,6 +30,8 @@ public class Drives extends Subsystem {
 			rightDrive.enableBrakeMode(true);
 			rightDrive.reverseOutput(false);	//closed loop method
 			rightDrive.setInverted(false);
+			rightDrive.reverseSensor(true);
+			rightDrive.setEncPosition(0);
 		}
 		if (robotDrive == null)
 		{
@@ -48,6 +51,19 @@ public class Drives extends Subsystem {
 		SmartDashboard.putNumber("rightDriveCurrent", rightDrive.getOutputCurrent());
 		SmartDashboard.putNumber("rightDriveTemperature", rightDrive.getTemperature());
 		SmartDashboard.putNumber("rightDriveVolt", rightDrive.getOutputVoltage());
+		SmartDashboard.putNumber("leftDrivePos", leftDrive.getEncPosition());
+		SmartDashboard.putNumber("rightDrivePos", rightDrive.getEncPosition());
+	}
+	
+	public void ResetEncPos()
+	{
+		leftDrive.setEncPosition(0);
+		rightDrive.setEncPosition(0);
+	}
+	
+	public double GetEncPos()
+	{
+		return leftDrive.getEncPosition();
 	}
 	
 	public void ArcadeDrive(double yAxis, double xAxis)

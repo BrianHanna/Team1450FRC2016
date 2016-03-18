@@ -1,7 +1,7 @@
 package org.usfirst.frc.team1450.robot.commands;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team1450.robot.Robot;
 
@@ -21,9 +21,7 @@ public class DriveForward extends Command {
     protected void initialize() {
     	stateMachinePtr = 0;
     	loopCounter = 0;
-    	Robot.drives.Drive(0.5, 0);
-    	Timer.delay(3.0);
-    	
+    	Robot.drives.ResetEncPos();
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -31,12 +29,28 @@ public class DriveForward extends Command {
     	switch ( stateMachinePtr )
     	{
     	case 0:
-    		if (loopCounter++ >= (3 / 0.02))
-    		{
-    			Robot.drives.Drive(0.0, 0.0);
-    			stateMachinePtr++;
-    		}
-    		break;
+			Robot.drives.Drive(SmartDashboard.getNumber("AutoDriveSpeed%")/100, 0);
+			stateMachinePtr++;
+			break;
+		case 1:
+			if (Robot.drives.GetEncPos() * 37 / 12593 >= SmartDashboard.getNumber("AutoDriveDistance"))
+			{
+				Robot.drives.Drive(0, 0);
+				Robot.feeder.Release();
+				loopCounter = 0;
+				stateMachinePtr++;
+			}
+			else
+			{
+				if (loopCounter++ >= (10 / 0.02))
+				{
+					Robot.drives.Drive(0, 0);
+					Robot.feeder.Release();
+					loopCounter = 0;
+					stateMachinePtr++;
+				}
+			}
+			break;
     		
     		default:
     			break;
