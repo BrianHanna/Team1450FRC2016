@@ -115,18 +115,6 @@ public class Robot extends IterativeRobot {
 	public void disabledPeriodic() {
 		Scheduler.getInstance().run();
 	}
-
-	/**
-	 * This autonomous (along with the chooser code above) shows how to select
-	 * between different autonomous modes using the dashboard. The sendable
-	 * chooser code works with the Java SmartDashboard. If you prefer the
-	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-	 * getString code to get the auto name from the text box below the Gyro
-	 *
-	 * You can add additional auto modes by adding additional commands to the
-	 * chooser code above (like the commented example) or additional comparisons
-	 * to the switch structure below with additional strings & commands.
-	 */
 	
 	double camXPosition;
 	double camYPosition;
@@ -243,15 +231,15 @@ public class Robot extends IterativeRobot {
 				armControl.RightOffCommand();
 			}
 		}
-		camXFiltered += ((oi.controller1.getRawAxis(RobotMap.xBoxRightX)*1) - camXFiltered) * 0.3;
-		camYFiltered += (oi.controller1.getRawAxis(RobotMap.xBoxRightY) - camYFiltered) * 0.3;
-		if (((oi.controller1.getRawAxis(RobotMap.xBoxRightX)*-1) > 0.5) || ((oi.controller1.getRawAxis(RobotMap.xBoxRightX)*-1) < -0.5))
+		camXFiltered += ((oi.controller2.getRawAxis(RobotMap.xBoxRightX)*1) - camXFiltered) * 0.3;
+		camYFiltered += (oi.controller2.getRawAxis(RobotMap.xBoxRightY) - camYFiltered) * 0.3;
+		if (((oi.controller2.getRawAxis(RobotMap.xBoxRightX)*-1) > 0.5) || ((oi.controller2.getRawAxis(RobotMap.xBoxRightX)*-1) < -0.5))
 		{
-			camXPosition += (oi.controller1.getRawAxis(RobotMap.xBoxRightX)*-1) * 0.01;
+			camXPosition += (oi.controller2.getRawAxis(RobotMap.xBoxRightX)*-1) * 0.01;
 		}
-		if ((oi.controller1.getRawAxis(RobotMap.xBoxRightY) > 0.2) || (oi.controller1.getRawAxis(RobotMap.xBoxRightY) < -0.2))
+		if ((oi.controller2.getRawAxis(RobotMap.xBoxRightY) > 0.2) || (oi.controller2.getRawAxis(RobotMap.xBoxRightY) < -0.2))
 		{
-			camYPosition += oi.controller1.getRawAxis(RobotMap.xBoxRightY) * 0.01;
+			camYPosition += oi.controller2.getRawAxis(RobotMap.xBoxRightY) * 0.01;
 		}
 		if (camXPosition > 1)
 		{
@@ -305,25 +293,23 @@ public class Robot extends IterativeRobot {
 				drives.ArcadeDrive(driveCommand * maxDriveSpeed, oi.controller1.getX(Hand.kLeft));
 			}
 		}
-		tower.GetMotorStatus(!leftTowerDown.get(), !rightTowerDown.get());
-		double leftOut, rightOut;
-		leftOut = oi.controller2.getRawAxis(RobotMap.xBoxRightY);
-		rightOut = oi.controller2.getRawAxis(RobotMap.xBoxRightY);
-		SmartDashboard.putBoolean("LeftTowerDown", !leftTowerDown.get());
-		SmartDashboard.putBoolean("LeftTowerDown", !leftTowerDown.get());
-		SmartDashboard.putNumber("TowerMove", oi.controller2.getRawAxis(RobotMap.xBoxRightY));
-		if (oi.controller2.getRawAxis(RobotMap.xBoxRightY) > 0 )
-		{
-			if (!leftTowerDown.get())
-			{
-				leftOut = 0;
-			}
-			if (!rightTowerDown.get())
-			{
-				rightOut = 0;
-			}
-		}
-		tower.Move(leftOut, rightOut);
+//		tower.GetMotorStatus(!leftTowerDown.get(), !rightTowerDown.get());
+//		double leftOut, rightOut;
+//		leftOut = oi.controller2.getRawAxis(RobotMap.xBoxRightY);
+//		rightOut = oi.controller2.getRawAxis(RobotMap.xBoxRightY);
+//		SmartDashboard.putNumber("TowerMove", oi.controller2.getRawAxis(RobotMap.xBoxRightY));
+//		if (oi.controller2.getRawAxis(RobotMap.xBoxRightY) > 0 )
+//		{
+//			if (!leftTowerDown.get())
+//			{
+//				leftOut = 0;
+//			}
+//			if (!rightTowerDown.get())
+//			{
+//				rightOut = 0;
+//			}
+//		}
+//		tower.Move(leftOut, rightOut);
 		camServoX.set(-camXPosition);
     	camServoY.set(camYPosition);
 	}
