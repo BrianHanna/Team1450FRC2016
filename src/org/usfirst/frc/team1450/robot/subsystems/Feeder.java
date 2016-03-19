@@ -24,12 +24,12 @@ public class Feeder extends Subsystem {
 	
 	public void Feed()
 	{
-		feederMotor.set(1.0);
+		feederMotor.set(-1.0);
 	}
 	
 	public void Release()
 	{
-		feederMotor.set(-1.0);
+		feederMotor.set(1.0);
 	}
 	
 	public void Off()

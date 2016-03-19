@@ -66,6 +66,12 @@ public class Drives extends Subsystem {
 		return leftDrive.getEncPosition();
 	}
 	
+	public void EnableBreakingMode(boolean breakBool)
+	{
+		leftDrive.enableBrakeMode(breakBool);
+		rightDrive.enableBrakeMode(breakBool);
+	}
+	
 	public void ArcadeDrive(double yAxis, double xAxis)
 	{
 		robotDrive.arcadeDrive(-yAxis, -xAxis, true);
@@ -84,5 +90,10 @@ public class Drives extends Subsystem {
 	@Override
 	protected void initDefaultCommand() {
 		// TODO Auto-generated method stub
+	}
+
+	public void SetRawMotor(double leftMotPow, double rightMotPow) {
+		leftDrive.set(leftMotPow);
+		rightDrive.set(rightMotPow);
 	}
 }

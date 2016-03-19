@@ -42,7 +42,7 @@ public class Robot extends IterativeRobot {
 	public static OI oi;
 	Compressor c;
 	CameraServer camServ;
-	ADXRS450_Gyro gyro;
+	public static ADXRS450_Gyro gyro;
 	Servo camServoY;
 	Servo camServoX;
 	DigitalInput leftTowerDown;
@@ -84,7 +84,6 @@ public class Robot extends IterativeRobot {
         {
 	        camServ.setQuality(50);
 	        camServ.startAutomaticCapture("cam0");
-	        
         }
         catch (Exception e)
         {
@@ -95,10 +94,10 @@ public class Robot extends IterativeRobot {
 		chooser.addObject("Do nothing", new ExampleCommand());
 		camServoY = new Servo(1);
 		camServoX = new Servo(0);
-		camServoX.set(-0.025);
+		camServoX.set(-0.197);
 		camServoY.set(0.855);
 		SmartDashboard.putData("Auto mode", chooser);
-		SmartDashboard.putNumber("MaxDriveSpeed%", 95);
+		SmartDashboard.putNumber("MaxDriveSpeed%", 100);
 		SmartDashboard.putNumber("TowerSpeed%", 100);
 		SmartDashboard.putNumber("AutoDriveSpeed%", 95);
 		SmartDashboard.putNumber("AutoDriveDistance", 17 * 12);
@@ -128,9 +127,16 @@ public class Robot extends IterativeRobot {
 	 * chooser code above (like the commented example) or additional comparisons
 	 * to the switch structure below with additional strings & commands.
 	 */
+	
+	double camXPosition;
+	double camYPosition;
+	
 	public void autonomousInit() {
 		autonomousCommand = (Command) chooser.getSelected();
-		
+		camXPosition=-0.197;
+		camYPosition=0.765;
+		camServoX.set(camXPosition);
+		camServoY.set(camYPosition);
 
 //		String autoSelected = SmartDashboard.getString("Auto Selector", "Drive Forward");
 //		switch (autoSelected) {
@@ -163,13 +169,18 @@ public class Robot extends IterativeRobot {
 		// this line or comment it out.
 		if (autonomousCommand != null)
 			autonomousCommand.cancel();
-	}
+		camXPosition=-0.197;
+		camYPosition=0.765;
+		camServoX.set(camXPosition);
+		camServoY.set(camYPosition);
+		loopCounter = 0;
+		}
 
 	double lowPassFilteredSpeed = 0.0;
 	double camXFiltered = 0.0;
 	double camYFiltered = 0.0;
-	double camXPosition=-0.197;
-	double camYPosition=0.765;
+	static int loopCounter = 0;
+	
 	
 	/**
 	 * This function is called periodically during operator control
@@ -183,6 +194,14 @@ public class Robot extends IterativeRobot {
 //		SmartDashboard.putBoolean("leftArmUp", leftArmUp.get());
 //		SmartDashboard.putBoolean("rightArmDown", rightArmDown.get());
 //		SmartDashboard.putBoolean("rightArmUp", rightArmUp.get());
+		if (loopCounter++ >= (100 / 0.02))
+		{
+			drives.EnableBreakingMode(true);
+		}
+		else
+		{
+			drives.EnableBreakingMode(false);
+		}
 		drives.GetDriveMotorStats();
 		if (oi.controller2.getRawAxis(RobotMap.xBoxLeftY) < -0.2) {
 			if (!leftArmUp.get())
@@ -271,7 +290,21 @@ public class Robot extends IterativeRobot {
 		// to revert replace /*driveCommand*/ with /*oi.controller1.getY(Hand.kLeft)*/
 		driveCommand = oi.controller1.getY(Hand.kLeft);
 		lowPassFilteredSpeed += (driveCommand - lowPassFilteredSpeed) * 0.3;
-		drives.ArcadeDrive(driveCommand * maxDriveSpeed, oi.controller1.getX(Hand.kLeft));
+		if (oi.controller1.getRawAxis(RobotMap.xBoxLeftTrigger) > 0.2)
+		{
+			drives.SetRawMotor(-oi.controller1.getRawAxis(RobotMap.xBoxLeftTrigger),-oi.controller1.getRawAxis(RobotMap.xBoxLeftTrigger));
+		}
+		else
+		{
+			if (oi.controller1.getRawAxis(RobotMap.xBoxRightTrigger) > 0.2)
+			{
+				drives.SetRawMotor(oi.controller1.getRawAxis(RobotMap.xBoxRightTrigger),oi.controller1.getRawAxis(RobotMap.xBoxRightTrigger));
+			}
+			else
+			{
+				drives.ArcadeDrive(driveCommand * maxDriveSpeed, oi.controller1.getX(Hand.kLeft));
+			}
+		}
 		tower.GetMotorStatus(!leftTowerDown.get(), !rightTowerDown.get());
 		double leftOut, rightOut;
 		leftOut = oi.controller2.getRawAxis(RobotMap.xBoxRightY);

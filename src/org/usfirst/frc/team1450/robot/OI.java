@@ -17,8 +17,8 @@ public class OI {
     // Joystick stick = new Joystick(port);
     // Button button = new JoystickButton(stick, buttonNumber);
 	Joystick controller1 = new Joystick(0);
-	JoystickButton aButton1 = new JoystickButton(controller1,3);
-	JoystickButton bButton1 = new JoystickButton(controller1,4);
+	JoystickButton aButton1 = new JoystickButton(controller1,4);
+	JoystickButton bButton1 = new JoystickButton(controller1,3);
 	Joystick controller2 = new Joystick(1);
     
     // There are a few additional built in buttons you can use. Additionally,
