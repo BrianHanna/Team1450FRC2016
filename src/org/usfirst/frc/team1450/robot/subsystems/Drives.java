@@ -15,6 +15,8 @@ public class Drives extends Subsystem {
 	CANTalon leftDrive;
 	CANTalon rightDrive;
 	RobotDrive robotDrive;
+	static int loopCounter;
+	static double lowPassFilteredSpeed;
 	public void Init() {
 		if (leftDrive == null)
 		{
@@ -42,17 +44,253 @@ public class Drives extends Subsystem {
 	}
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
-
-	public void GetDriveMotorStats()
+	
+	public void TeleopInit()
 	{
-		SmartDashboard.putNumber("leftDriveCurrent", leftDrive.getOutputCurrent());
-		SmartDashboard.putNumber("leftDriveTemperature", leftDrive.getTemperature());
-		SmartDashboard.putNumber("leftDriveVolt", leftDrive.getOutputVoltage());
-		SmartDashboard.putNumber("rightDriveCurrent", rightDrive.getOutputCurrent());
-		SmartDashboard.putNumber("rightDriveTemperature", rightDrive.getTemperature());
-		SmartDashboard.putNumber("rightDriveVolt", rightDrive.getOutputVoltage());
-		SmartDashboard.putNumber("leftDrivePos", leftDrive.getEncPosition());
-		SmartDashboard.putNumber("rightDrivePos", rightDrive.getEncPosition());
+		loopCounter = 0;
+		lowPassFilteredSpeed = 0;
+	}
+	
+	public void TeleopPeriodic(double robotAngle, double leftXAxis, double leftYAxis, double rightXAxis, double rightYAxis, boolean up, boolean right, boolean down, boolean left, double leftTrigger, double rightTrigger, boolean leftButton, boolean rightButton)
+	{
+		// Determine max speed
+		double maxDriveSpeed = SmartDashboard.getNumber("MaxDriveSpeed%");
+		if (maxDriveSpeed > 100)
+		{
+			maxDriveSpeed = 100;
+		}
+		if (maxDriveSpeed < 0)
+		{
+			maxDriveSpeed = 0;
+		}
+		maxDriveSpeed = maxDriveSpeed / 100;
+		if (leftButton && (!rightButton) )
+		{
+			maxDriveSpeed = maxDriveSpeed * 0.25;
+		}
+		else
+		{
+			if (leftButton && rightButton )
+			{
+				maxDriveSpeed = maxDriveSpeed * 0.5;
+			}
+			else
+			{
+				if ((!leftButton) && rightButton )
+				{
+					maxDriveSpeed = maxDriveSpeed * 0.75;
+				}
+			}
+		}
+		
+		//Get left stick drive command
+		double driveCommand;
+//		driveCommand = Math.sqrt((leftXAxis * leftXAxis) + (leftXAxis * leftXAxis));
+//		if (leftXAxis <= 0)
+//		{
+//			driveCommand = -driveCommand;
+//		}
+		// to revert replace /*driveCommand*/ with /*leftXAxis*/
+		driveCommand = leftYAxis;
+		lowPassFilteredSpeed += (driveCommand - lowPassFilteredSpeed) * 0.3;
+		double rightStickCommand = Math.sqrt((rightXAxis * rightXAxis) + (rightYAxis * rightYAxis));
+		double rightStickRotation = 0;
+		double stickAngle = 0;
+		rightYAxis = -rightYAxis;
+		if (rightXAxis == 0)
+		{
+			if (rightYAxis < 0)
+			{
+				stickAngle = 180;
+			}
+		}
+		else
+		{
+			if (rightYAxis == 0)
+			{
+				if (rightXAxis < 0)
+				{
+					stickAngle = 270;
+				}
+				else
+				{
+					if (rightXAxis > 0)
+					{
+						stickAngle = 90;
+					}
+				}
+			}
+			else
+			{
+				stickAngle = Math.atan(Math.abs(rightXAxis/rightYAxis)) * 180 / Math.PI;
+				if (rightYAxis < 0)
+				{
+					if (rightXAxis > 0)
+					{
+						stickAngle = 180 - stickAngle;
+					}
+					else
+					{
+						stickAngle = 180 + stickAngle;
+					}
+				}
+				else
+				{
+					if (rightXAxis < 0)
+					{
+						stickAngle = 360 - stickAngle;
+					}
+				}
+			}
+		}
+		SmartDashboard.putNumber("RightStickRawCmd", rightStickCommand);
+		SmartDashboard.putNumber("StickAngle", stickAngle);
+		rightStickRotation = rightStickCommand * (Math.sin(((robotAngle - stickAngle) * Math.PI / 180 / 2)));
+		if ((robotAngle - stickAngle) > 180)
+		{
+			robotAngle = robotAngle - 360;
+		}
+		rightStickCommand = -1 * rightStickCommand * (Math.cos(((stickAngle - robotAngle) * Math.PI / 180 / 2)));
+		SmartDashboard.putNumber("RightStickCmd", rightStickCommand);
+		SmartDashboard.putNumber("RightStickRot", rightStickRotation);
+		
+		//robotAngle = 0
+
+		//Drive robot
+		SmartDashboard.putNumber("adjustedAngle", robotAngle);
+		if (up)	// Up
+		{
+			if ((robotAngle > 350) || (robotAngle < 10))
+			{
+				robotDrive.drive(1, 0);
+			}
+			else
+			{
+				if (robotAngle >= 180)
+				{
+					// right turn
+					leftDrive.set(0.75);
+					rightDrive.set(0.75);
+				}
+				else
+				{
+					// left turn
+					leftDrive.set(-0.75);
+					rightDrive.set(-0.75);
+				}
+			}
+		}
+		else
+		{
+			if (right)	// Right
+			{
+				if ((robotAngle > 80) && (robotAngle < 100))
+				{
+					robotDrive.drive(1, 0);
+				}
+				else
+				{
+					if ((robotAngle <= 85) || (robotAngle >= 270))
+					{
+						// right turn
+						leftDrive.set(0.75);
+						rightDrive.set(0.75);
+					}
+					else
+					{
+						// left turn
+						leftDrive.set(-0.75);
+						rightDrive.set(-0.75);
+					}
+				}
+			}
+			else
+			{
+				if (down)	// Down
+				{
+					if ((robotAngle > 170) && (robotAngle < 190))
+					{
+						robotDrive.drive(1, 0);
+					}
+					else
+					{
+						if (robotAngle <= 175)
+						{
+							// right turn
+							leftDrive.set(0.75);
+							rightDrive.set(0.75);
+						}
+						else
+						{
+							// left turn
+							leftDrive.set(-0.75);
+							rightDrive.set(-0.75);
+						}
+					}
+				}
+				else
+				{
+					if (left)	// Left
+					{
+						if ((robotAngle > 260) && (robotAngle < 280))
+						{
+							robotDrive.drive(1, 0);
+						}
+						else
+						{
+							if ((robotAngle <= 265) && (robotAngle >= 90))
+							{
+								// right turn
+								leftDrive.set(0.75);
+								rightDrive.set(0.75);
+							}
+							else
+							{
+								// left turn
+								leftDrive.set(-0.75);
+								rightDrive.set(-0.75);
+							}
+						}
+					}
+					else
+					{
+						if (leftTrigger > 0.2)
+						{
+							leftDrive.set(-leftTrigger);
+							rightDrive.set(-leftTrigger);
+						}
+						else
+						{
+							if (rightTrigger > 0.2)
+							{
+								leftDrive.set(rightTrigger);
+								rightDrive.set(rightTrigger);
+							}
+							else
+							{
+								if ((driveCommand > 0.1) || (driveCommand < -0.1))
+								{
+									robotDrive.arcadeDrive(-driveCommand * maxDriveSpeed, -leftXAxis, true);
+								}
+								else
+								{
+									robotDrive.arcadeDrive(-rightStickCommand * maxDriveSpeed, -rightStickRotation, true);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		//Display drive stats
+				SmartDashboard.putNumber("leftDriveCurrent", leftDrive.getOutputCurrent());
+				SmartDashboard.putNumber("leftDriveTemperature", leftDrive.getTemperature());
+				SmartDashboard.putNumber("leftDriveVolt", leftDrive.getOutputVoltage());
+				SmartDashboard.putNumber("rightDriveCurrent", rightDrive.getOutputCurrent());
+				SmartDashboard.putNumber("rightDriveTemperature", rightDrive.getTemperature());
+				SmartDashboard.putNumber("rightDriveVolt", rightDrive.getOutputVoltage());
+				SmartDashboard.putNumber("leftDrivePos", leftDrive.getEncPosition());
+				SmartDashboard.putNumber("rightDrivePos", rightDrive.getEncPosition());
 	}
 	
 	public void ResetEncPos()

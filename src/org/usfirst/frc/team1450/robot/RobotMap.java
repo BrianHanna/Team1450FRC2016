@@ -21,6 +21,16 @@ public class RobotMap {
 	public static int xBoxRightTrigger = 3;
 	public static int xBoxRightX = 4;
 	public static int xBoxRightY = 5;
+	public static int xBoxAButton = 1;	//fixed
+	public static int xBoxBButton = 2;	//
+	public static int xBoxXButton = 3;	//fixed
+	public static int xBoxYButton = 4;	//fixed
+	public static int xBoxLeftButton = 5;
+	public static int xBoxRightButton = 6;
+	public static int xBoxBackButton = 7;
+	public static int xBoxStartButton = 8;
+	public static int xBoxLeftStickButton = 9;
+	public static int xBoxRightStickButton = 10;
     
     // If you are using multiple modules, make sure to define both the port
     // number and the module. For example you with a rangefinder:

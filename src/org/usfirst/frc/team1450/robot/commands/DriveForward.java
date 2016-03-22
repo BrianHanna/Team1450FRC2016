@@ -55,12 +55,12 @@ public class DriveForward extends Command {
 			if (loopCounter++ >= (1.5 / 0.02))
 			{
 				Robot.feeder.Off();
-				Robot.drives.SetRawMotor(0.5, 0.5);
+				Robot.drives.SetRawMotor(0.75, 0.75);
 				stateMachinePtr++;
 			}
 			break;
 		case 3:
-			if (((Robot.gyro.getAngle() >= 160) && (Robot.gyro.getAngle() <= 200)) || ((Robot.gyro.getAngle() <= -160) && (Robot.gyro.getAngle() >= -200)))
+			if (((Robot.gyro.getAngle() >= 170) && (Robot.gyro.getAngle() <= 190)) || ((Robot.gyro.getAngle() <= -170) && (Robot.gyro.getAngle() >= -190)))
 			{
 				Robot.drives.Drive(0, 0);
 				stateMachinePtr++;
