@@ -146,6 +146,10 @@ public class Robot extends IterativeRobot {
 	 */
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
+		if (oi.controller1.getRawButton(RobotMap.xBoxStartButton))
+		{
+			gyro.reset();
+		}
 		double robotAngle = gyro.getAngle();
 		int angleDiv = (int) (robotAngle / 360);
 		if (robotAngle < 0)

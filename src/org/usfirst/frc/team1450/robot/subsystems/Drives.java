@@ -148,7 +148,7 @@ public class Drives extends Subsystem {
 		}
 		SmartDashboard.putNumber("RightStickRawCmd", rightStickCommand);
 		SmartDashboard.putNumber("StickAngle", stickAngle);
-		double angleError = robotAngle - stickAngle;
+		double angleError = stickAngle - robotAngle;
 		if (angleError > 180)
 		{
 			angleError = angleError - 360;
@@ -177,7 +177,7 @@ public class Drives extends Subsystem {
 			}
 			if (povAngle == 180)
 			{
-				nudgePtr = 100;
+				nudgePtr = 3;
 			}
 		}
 		switch (nudgePtr)
@@ -194,14 +194,14 @@ public class Drives extends Subsystem {
 						if (robotAngle >= 180)
 						{
 							// right turn
-							leftDrive.set(0.75);
-							rightDrive.set(0.75);
+							leftDrive.set(1.0);
+							rightDrive.set(1.0);
 						}
 						else
 						{
 							// left turn
-							leftDrive.set(-0.75);
-							rightDrive.set(-0.75);
+							leftDrive.set(-1.0);
+							rightDrive.set(-1.0);
 						}
 					}
 				}
@@ -218,14 +218,14 @@ public class Drives extends Subsystem {
 							if ((robotAngle <= 85) || (robotAngle >= 270))
 							{
 								// right turn
-								leftDrive.set(0.75);
-								rightDrive.set(0.75);
+								leftDrive.set(1.0);
+								rightDrive.set(1.0);
 							}
 							else
 							{
 								// left turn
-								leftDrive.set(-0.75);
-								rightDrive.set(-0.75);
+								leftDrive.set(-1.0);
+								rightDrive.set(-1.0);
 							}
 						}
 					}
@@ -242,14 +242,14 @@ public class Drives extends Subsystem {
 								if (robotAngle <= 175)
 								{
 									// right turn
-									leftDrive.set(0.75);
-									rightDrive.set(0.75);
+									leftDrive.set(1.0);
+									rightDrive.set(1.0);
 								}
 								else
 								{
 									// left turn
-									leftDrive.set(-0.75);
-									rightDrive.set(-0.75);
+									leftDrive.set(-1.0);
+									rightDrive.set(-1.0);
 								}
 							}
 						}
@@ -266,14 +266,14 @@ public class Drives extends Subsystem {
 									if ((robotAngle <= 265) && (robotAngle >= 90))
 									{
 										// right turn
-										leftDrive.set(0.75);
-										rightDrive.set(0.75);
+										leftDrive.set(1.0);
+										rightDrive.set(1.0);
 									}
 									else
 									{
 										// left turn
-										leftDrive.set(-0.75);
-										rightDrive.set(-0.75);
+										leftDrive.set(-1.0);
+										rightDrive.set(-1.0);
 									}
 								}
 							}
@@ -309,30 +309,12 @@ public class Drives extends Subsystem {
 				}
 				break;
 			case 1:
-				if ((robotAngle > 350) || (robotAngle < 10))
-				{
-					robotDrive.drive(0,0);
-					leftDrive.setEncPosition(0);
-					rightDrive.setEncPosition(0);
-					robotDrive.drive(0.5, 0);
-					nudgePtr++;
-					loopCounter = 0;
-				}
-				else
-				{
-					if (robotAngle >= 180)
-					{
-						// right turn
-						leftDrive.set(0.75);
-						rightDrive.set(0.75);
-					}
-					else
-					{
-						// left turn
-						leftDrive.set(-0.75);
-						rightDrive.set(-0.75);
-					}
-				}
+				robotDrive.drive(0,0);
+				leftDrive.setEncPosition(0);
+				rightDrive.setEncPosition(0);
+				robotDrive.drive(0.5, 0);
+				nudgePtr++;
+				loopCounter = 0;
 				break;
 			case 2:
 				if (Robot.drives.GetEncPos() * 37 / 12593 >= 1)
@@ -352,30 +334,12 @@ public class Drives extends Subsystem {
 				}
 				break;
 			case 3:
-				if ((robotAngle > 170) || (robotAngle < 190))
-				{
-					robotDrive.drive(0,0);
-					leftDrive.setEncPosition(0);
-					rightDrive.setEncPosition(0);
-					robotDrive.drive(-0.5, 0);
-					nudgePtr++;
-					loopCounter = 0;
-				}
-				else
-				{
-					if (robotAngle >= 0)
-					{
-						// right turn
-						leftDrive.set(0.75);
-						rightDrive.set(0.75);
-					}
-					else
-					{
-						// left turn
-						leftDrive.set(-0.75);
-						rightDrive.set(-0.75);
-					}
-				}
+				robotDrive.drive(0,0);
+				leftDrive.setEncPosition(0);
+				rightDrive.setEncPosition(0);
+				robotDrive.drive(-0.5, 0);
+				nudgePtr++;
+				loopCounter = 0;
 				break;
 			case 4:
 				if (Robot.drives.GetEncPos() * 37 / 12593 <= -1.0)
