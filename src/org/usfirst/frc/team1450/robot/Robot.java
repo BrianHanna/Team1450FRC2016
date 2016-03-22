@@ -153,7 +153,7 @@ public class Robot extends IterativeRobot {
 			angleDiv = angleDiv - 1;
 		}
 		robotAngle = robotAngle - (angleDiv * 360);
-		drives.TeleopPeriodic(robotAngle, oi.controller1.getRawAxis(RobotMap.xBoxLeftX), oi.controller1.getRawAxis(RobotMap.xBoxLeftY), oi.controller1.getRawAxis(RobotMap.xBoxRightX), oi.controller1.getRawAxis(RobotMap.xBoxRightY), oi.controller1.getRawButton(RobotMap.xBoxYButton), oi.controller1.getRawButton(RobotMap.xBoxBButton), oi.controller1.getRawButton(RobotMap.xBoxAButton), oi.controller1.getRawButton(RobotMap.xBoxXButton), oi.controller1.getRawAxis(RobotMap.xBoxLeftTrigger), oi.controller1.getRawAxis(RobotMap.xBoxRightTrigger), oi.controller1.getRawButton(RobotMap.xBoxLeftButton), oi.controller1.getRawButton(RobotMap.xBoxRightButton));
+		drives.TeleopPeriodic(robotAngle, oi.controller1.getRawAxis(RobotMap.xBoxLeftX), oi.controller1.getRawAxis(RobotMap.xBoxLeftY), oi.controller1.getRawAxis(RobotMap.xBoxRightX), oi.controller1.getRawAxis(RobotMap.xBoxRightY), oi.controller1.getRawButton(RobotMap.xBoxYButton), oi.controller1.getRawButton(RobotMap.xBoxBButton), oi.controller1.getRawButton(RobotMap.xBoxAButton), oi.controller1.getRawButton(RobotMap.xBoxXButton), oi.controller1.getRawAxis(RobotMap.xBoxLeftTrigger), oi.controller1.getRawAxis(RobotMap.xBoxRightTrigger), oi.controller1.getRawButton(RobotMap.xBoxLeftButton), oi.controller1.getRawButton(RobotMap.xBoxRightButton), oi.controller1.getPOV());
 		armControl.TeleopPeriodic(oi.controller2.getRawAxis(RobotMap.xBoxLeftY));
 		tower.TeleopPeriodic(oi.controller2.getRawAxis(RobotMap.xBoxRightY));
 		SmartDashboard.putNumber("GyroAngle", gyro.getAngle());
