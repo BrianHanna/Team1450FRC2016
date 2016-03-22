@@ -145,12 +145,20 @@ public class Drives extends Subsystem {
 		}
 		SmartDashboard.putNumber("RightStickRawCmd", rightStickCommand);
 		SmartDashboard.putNumber("StickAngle", stickAngle);
-		rightStickRotation = rightStickCommand * (Math.sin(((robotAngle - stickAngle) * Math.PI / 180 / 2)));
-		if ((robotAngle - stickAngle) > 180)
+		double angleError = robotAngle - stickAngle;
+		if (angleError > 180)
 		{
-			robotAngle = robotAngle - 360;
+			angleError = angleError - 360;
 		}
-		rightStickCommand = -1 * rightStickCommand * (Math.cos(((stickAngle - robotAngle) * Math.PI / 180 / 2)));
+		else
+		{
+			if (angleError < -180)
+			{
+				angleError = angleError + 360;
+			}
+		}
+		rightStickRotation = rightStickCommand * (Math.sin((angleError * Math.PI / 180 / 2)));
+		rightStickCommand = -1 * rightStickCommand * (Math.cos((angleError * Math.PI / 180 / 2)));
 		SmartDashboard.putNumber("RightStickCmd", rightStickCommand);
 		SmartDashboard.putNumber("RightStickRot", rightStickRotation);
 		
