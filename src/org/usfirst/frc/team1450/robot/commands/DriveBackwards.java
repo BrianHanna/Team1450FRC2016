@@ -43,7 +43,7 @@ public class DriveBackwards extends Command {
 	protected void initialize() {
 		stateMachinePtr = 0;
     	loopCounter = 0;
-    	Robot.drives.Drive(-1 * SmartDashboard.getNumber("AutoDriveSpeed%")/100, 0);
+    	Robot.drives.Drive(-1 * SmartDashboard.getNumber("AutoDriveSpeed%",70)/100, 0);
     	Timer.delay(3.0);
 	}
 

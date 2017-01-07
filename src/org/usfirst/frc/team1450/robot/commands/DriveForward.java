@@ -29,11 +29,11 @@ public class DriveForward extends Command {
     	switch ( stateMachinePtr )
     	{
     	case 0:
-			Robot.drives.Drive(SmartDashboard.getNumber("AutoDriveSpeed%")/100, 0);
+			Robot.drives.Drive(SmartDashboard.getNumber("AutoDriveSpeed%",70)/100, 0);
 			stateMachinePtr++;
 			break;
 		case 1:
-			if (Robot.drives.GetEncPos() * 37 / 12593 >= SmartDashboard.getNumber("AutoDriveDistance"))
+			if (Robot.drives.GetEncPos() * 37 / 12593 >= SmartDashboard.getNumber("AutoDriveDistance",70))
 			{
 				Robot.drives.Drive(0, 0);
 				Robot.feeder.Release();

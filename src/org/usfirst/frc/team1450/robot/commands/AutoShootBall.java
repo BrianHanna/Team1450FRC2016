@@ -26,7 +26,7 @@ public class AutoShootBall extends Command {
 		switch (stateMachinePtr)
 		{
 			case 0:
-				Robot.drives.Drive(SmartDashboard.getNumber("AutoDriveSpeed%")/100, 0);
+				Robot.drives.Drive(SmartDashboard.getNumber("AutoDriveSpeed%",70)/100, 0);
 				stateMachinePtr++;
 				break;
 			case 1:

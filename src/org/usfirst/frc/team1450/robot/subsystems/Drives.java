@@ -4,7 +4,7 @@ package org.usfirst.frc.team1450.robot.subsystems;
 import org.usfirst.frc.team1450.robot.Robot;
 import org.usfirst.frc.team1450.robot.RobotMap;
 
-import edu.wpi.first.wpilibj.CANTalon;
+import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -57,7 +57,7 @@ public class Drives extends Subsystem {
 	public void TeleopPeriodic(double robotAngle, double leftXAxis, double leftYAxis, double rightXAxis, double rightYAxis, boolean up, boolean right, boolean down, boolean left, double leftTrigger, double rightTrigger, boolean leftButton, boolean rightButton, int povAngle)
 	{
 		// Determine max speed
-		double maxDriveSpeed = SmartDashboard.getNumber("MaxDriveSpeed%");
+		double maxDriveSpeed = SmartDashboard.getNumber("MaxDriveSpeed%",70);
 		if (maxDriveSpeed > 100)
 		{
 			maxDriveSpeed = 100;

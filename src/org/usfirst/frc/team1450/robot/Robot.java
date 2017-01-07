@@ -37,12 +37,11 @@ public class Robot extends IterativeRobot {
 	public static final Tower tower = new Tower();
 	public static final Feeder feeder = new Feeder();
 	public static OI oi;
-	CameraServer camServ;
 	public static ADXRS450_Gyro gyro;
 	Servo camServoY;
 	Servo camServoX;
 	Command autonomousCommand;
-	SendableChooser chooser;
+	SendableChooser<Command> chooser;
 	boolean standardArcadeDrive = true;
 
 	/**
@@ -59,18 +58,9 @@ public class Robot extends IterativeRobot {
 		oi.aButton1.whenReleased(new FeederOff());
 		oi.bButton1.whileHeld(new ReleaseBoulder());
 		oi.bButton1.whenReleased(new FeederOff());
-		chooser = new SendableChooser();
+		chooser = new SendableChooser<Command>();
 		chooser.addDefault("Drive Forward", new DriveForward());
-		camServ = CameraServer.getInstance();
-        try
-        {
-	        camServ.setQuality(50);
-	        camServ.startAutomaticCapture("cam0");
-        }
-        catch (Exception e)
-        {
-        	//
-        }
+		CameraServer.getInstance().startAutomaticCapture();
         gyro = new ADXRS450_Gyro();
         chooser.addObject("Shoot Boulder Autonomous", new AutoShootBall());
 		chooser.addObject("Do nothing", new ExampleCommand());

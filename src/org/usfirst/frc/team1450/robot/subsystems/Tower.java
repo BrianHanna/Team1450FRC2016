@@ -2,9 +2,9 @@ package org.usfirst.frc.team1450.robot.subsystems;
 
 import org.usfirst.frc.team1450.robot.RobotMap;
 
-import edu.wpi.first.wpilibj.CANTalon;
+import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
+import com.ctre.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -172,13 +172,13 @@ public class Tower extends Subsystem {
 				rightOut = 0.0;
 			}
 		}
-		leftOut = leftOut * SmartDashboard.getNumber("TowerSpeed%") / 100; 
+		leftOut = leftOut * SmartDashboard.getNumber("TowerSpeed%",70) / 100; 
 		leftTowerMotor.set(leftOut /*Following for PID*/ * 8000/*16162.5*/);
 		if ((rightOut < 0.2) && (rightOut > -0.2))
 		{
 			rightOut = 0.0;
 		}
-		rightOut = rightOut * SmartDashboard.getNumber("TowerSpeed%") / 100;
+		rightOut = rightOut * SmartDashboard.getNumber("TowerSpeed%",70) / 100;
 		SmartDashboard.putNumber("TowerSpeedCmd", rightOut * 8000/*16162.5*/);
 		rightTowerMotor.set(rightOut/*Following for PID*/ * 8000/*16162.5*/);
 	}

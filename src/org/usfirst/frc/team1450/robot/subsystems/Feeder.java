@@ -2,7 +2,7 @@ package org.usfirst.frc.team1450.robot.subsystems;
 
 import org.usfirst.frc.team1450.robot.RobotMap;
 
-import edu.wpi.first.wpilibj.CANTalon;
+import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class Feeder extends Subsystem {
