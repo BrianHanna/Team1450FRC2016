@@ -1,7 +1,7 @@
 package org.usfirst.frc.team1450.robot.commands;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team1450.robot.Robot;
 
@@ -13,17 +13,63 @@ public class DriveForward extends Command {
         // Use requires() here to declare subsystem dependencies
         requires(Robot.drives);
     }
+    
+    static int stateMachinePtr = 0;
+    static int loopCounter = 0;
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	Robot.drives.Drive(0.5, 0);
-    	Timer.delay(3.0);
-    	Robot.drives.Drive(0.0, 0.0);
+    	stateMachinePtr = 0;
+    	loopCounter = 0;
+    	Robot.drives.ResetEncPos();
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	
+    	switch ( stateMachinePtr )
+    	{
+    	case 0:
+			Robot.drives.Drive(SmartDashboard.getNumber("AutoDriveSpeed%",70)/100, 0);
+			stateMachinePtr++;
+			break;
+		case 1:
+			if (Robot.drives.GetEncPos() * 37 / 12593 >= SmartDashboard.getNumber("AutoDriveDistance",70))
+			{
+				Robot.drives.Drive(0, 0);
+				Robot.feeder.Release();
+				loopCounter = 0;
+				stateMachinePtr++;
+			}
+			else
+			{
+				if (loopCounter++ >= (10 / 0.02))
+				{
+					Robot.drives.Drive(0, 0);
+					Robot.feeder.Release();
+					loopCounter = 0;
+					stateMachinePtr++;
+				}
+			}
+			break;
+		case 2:
+			if (loopCounter++ >= (1.5 / 0.02))
+			{
+				Robot.feeder.Off();
+				Robot.drives.SetRawMotor(0.75, 0.75);
+				stateMachinePtr++;
+			}
+			break;
+		case 3:
+			if (((Robot.gyro.getAngle() >= 170) && (Robot.gyro.getAngle() <= 190)) || ((Robot.gyro.getAngle() <= -170) && (Robot.gyro.getAngle() >= -190)))
+			{
+				Robot.drives.Drive(0, 0);
+				stateMachinePtr++;
+			}
+			break;
+    		
+    		default:
+    			break;
+    	}
     }
 
     // Make this return true when this Command no longer needs to run execute()

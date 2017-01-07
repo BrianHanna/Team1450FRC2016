@@ -3,17 +3,15 @@ package org.usfirst.frc.team1450.robot;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
-import org.usfirst.frc.team1450.robot.commands.DriveBackwards;
 import org.usfirst.frc.team1450.robot.commands.DriveForward;
 import org.usfirst.frc.team1450.robot.commands.ExampleCommand;
+import org.usfirst.frc.team1450.robot.commands.AutoShootBall;
 import org.usfirst.frc.team1450.robot.commands.ReleaseBoulder;
 import org.usfirst.frc.team1450.robot.commands.FeedBoulder;
 import org.usfirst.frc.team1450.robot.commands.FeederOff;
@@ -39,14 +37,12 @@ public class Robot extends IterativeRobot {
 	public static final Tower tower = new Tower();
 	public static final Feeder feeder = new Feeder();
 	public static OI oi;
-	Compressor c;
-	CameraServer camServ;
-	ADXRS450_Gyro gyro;
+	public static ADXRS450_Gyro gyro;
 	Servo camServoY;
 	Servo camServoX;
-
 	Command autonomousCommand;
-	SendableChooser chooser;
+	SendableChooser<Command> chooser;
+	boolean standardArcadeDrive = true;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -62,30 +58,21 @@ public class Robot extends IterativeRobot {
 		oi.aButton1.whenReleased(new FeederOff());
 		oi.bButton1.whileHeld(new ReleaseBoulder());
 		oi.bButton1.whenReleased(new FeederOff());
-		chooser = new SendableChooser();
-		chooser.addDefault("Default Auto", new ExampleCommand());
-		c = new Compressor(1);
-		c.setClosedLoopControl(true);
-		c.start();
-		camServ = CameraServer.getInstance();
-        try
-        {
-	        camServ.setQuality(50);
-	        camServ.startAutomaticCapture("cam0");
-	        
-        }
-        catch (Exception e)
-        {
-        	//
-        }
+		chooser = new SendableChooser<Command>();
+		chooser.addDefault("Drive Forward", new DriveForward());
+		CameraServer.getInstance().startAutomaticCapture();
         gyro = new ADXRS450_Gyro();
-		chooser.addObject("Drive Forward", new DriveForward());
-		chooser.addObject("Drive Backwards", new DriveBackwards());
+        chooser.addObject("Shoot Boulder Autonomous", new AutoShootBall());
+		chooser.addObject("Do nothing", new ExampleCommand());
 		camServoY = new Servo(1);
 		camServoX = new Servo(0);
-		camServoX.set(0.5);
-		camServoY.set(0.5);
+		camServoX.set(-0.197);
+		camServoY.set(0.855);
 		SmartDashboard.putData("Auto mode", chooser);
+		SmartDashboard.putNumber("MaxDriveSpeed%", 100);
+		SmartDashboard.putNumber("TowerSpeed%", 100);
+		SmartDashboard.putNumber("AutoDriveSpeed%", 95);
+		SmartDashboard.putNumber("AutoDriveDistance", 17 * 12);
 	}
 
 	/**
@@ -100,34 +87,16 @@ public class Robot extends IterativeRobot {
 	public void disabledPeriodic() {
 		Scheduler.getInstance().run();
 	}
-
-	/**
-	 * This autonomous (along with the chooser code above) shows how to select
-	 * between different autonomous modes using the dashboard. The sendable
-	 * chooser code works with the Java SmartDashboard. If you prefer the
-	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-	 * getString code to get the auto name from the text box below the Gyro
-	 *
-	 * You can add additional auto modes by adding additional commands to the
-	 * chooser code above (like the commented example) or additional comparisons
-	 * to the switch structure below with additional strings & commands.
-	 */
+	
+	double camXPosition;
+	double camYPosition;
+	
 	public void autonomousInit() {
 		autonomousCommand = (Command) chooser.getSelected();
-
-//		String autoSelected = SmartDashboard.getString("Auto Selector", "Drive Forward");
-//		switch (autoSelected) {
-//		case "Drive Forward":
-//			autonomousCommand = new DriveForward();
-//
-//			break;
-//		case "Drive Backwards":
-//		default:
-//			autonomousCommand = new DriveBackwards();
-//			break;
-//		}
-
-		// schedule the autonomous command (example)
+		camXPosition=-0.197;
+		camYPosition=0.765;
+		camServoX.set(camXPosition);
+		camServoY.set(camYPosition);
 		if (autonomousCommand != null)
 			autonomousCommand.start();
 	}
@@ -146,36 +115,52 @@ public class Robot extends IterativeRobot {
 		// this line or comment it out.
 		if (autonomousCommand != null)
 			autonomousCommand.cancel();
+		camXPosition=-0.197;
+		camYPosition=0.765;
+		camServoX.set(camXPosition);
+		camServoY.set(camYPosition);
+		loopCounter = 0;
+		drives.TeleopInit();
+		tower.TeleopInit();
+		armControl.TeleopInit();
 	}
 
 	double lowPassFilteredSpeed = 0.0;
 	double camXFiltered = 0.0;
 	double camYFiltered = 0.0;
-	double camXPosition=0.5;
-	double camYPosition=0.5;
+	static int loopCounter = 0;
+	
 	
 	/**
 	 * This function is called periodically during operator control
 	 */
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-		SmartDashboard.putNumber("POV", oi.controller1.getPOV());
-		SmartDashboard.putNumber("GyroAngle", gyro.getAngle());
-		drives.GetDriveMotorStats();
-		if (oi.controller1.getPOV() == 0.0) {
-			armControl.UpCommand();
-		} else {
-			if (oi.controller1.getPOV() == 180.0) {
-				armControl.DownCommand();
-			} else {
-				armControl.OffCommand();
-			}
+		if (oi.controller1.getRawButton(RobotMap.xBoxStartButton))
+		{
+			gyro.reset();
 		}
-		lowPassFilteredSpeed += (oi.controller1.getY(Hand.kLeft) - lowPassFilteredSpeed) * 0.3;
-		camXFiltered += ((oi.controller2.getRawAxis(RobotMap.xBoxLeftX)*-1) - camXFiltered) * 0.3;
-		camYFiltered += (oi.controller2.getRawAxis(RobotMap.xBoxLeftY) - camYFiltered) * 0.3;
-		camXPosition += camXFiltered/10;
-		camYPosition += camYFiltered/10;
+		double robotAngle = gyro.getAngle();
+		int angleDiv = (int) (robotAngle / 360);
+		if (robotAngle < 0)
+		{
+			angleDiv = angleDiv - 1;
+		}
+		robotAngle = robotAngle - (angleDiv * 360);
+		drives.TeleopPeriodic(robotAngle, oi.controller1.getRawAxis(RobotMap.xBoxLeftX), oi.controller1.getRawAxis(RobotMap.xBoxLeftY), oi.controller1.getRawAxis(RobotMap.xBoxRightX), oi.controller1.getRawAxis(RobotMap.xBoxRightY), oi.controller1.getRawButton(RobotMap.xBoxYButton), oi.controller1.getRawButton(RobotMap.xBoxBButton), oi.controller1.getRawButton(RobotMap.xBoxAButton), oi.controller1.getRawButton(RobotMap.xBoxXButton), oi.controller1.getRawAxis(RobotMap.xBoxLeftTrigger), oi.controller1.getRawAxis(RobotMap.xBoxRightTrigger), oi.controller1.getRawButton(RobotMap.xBoxLeftButton), oi.controller1.getRawButton(RobotMap.xBoxRightButton), oi.controller1.getPOV());
+		armControl.TeleopPeriodic(oi.controller2.getRawAxis(RobotMap.xBoxLeftY));
+		tower.TeleopPeriodic(oi.controller2.getRawAxis(RobotMap.xBoxRightY));
+		SmartDashboard.putNumber("GyroAngle", gyro.getAngle());
+		camXFiltered += ((oi.controller2.getRawAxis(RobotMap.xBoxRightX)*1) - camXFiltered) * 0.3;
+		camYFiltered += (oi.controller2.getRawAxis(RobotMap.xBoxRightY) - camYFiltered) * 0.3;
+		if (((oi.controller2.getRawAxis(RobotMap.xBoxRightX)*-1) > 0.5) || ((oi.controller2.getRawAxis(RobotMap.xBoxRightX)*-1) < -0.5))
+		{
+			camXPosition += (oi.controller2.getRawAxis(RobotMap.xBoxRightX)*-1) * 0.01;
+		}
+		if ((oi.controller2.getRawAxis(RobotMap.xBoxRightY) > 0.2) || (oi.controller2.getRawAxis(RobotMap.xBoxRightY) < -0.2))
+		{
+			camYPosition += oi.controller2.getRawAxis(RobotMap.xBoxRightY) * 0.01;
+		}
 		if (camXPosition > 1)
 		{
 			camXPosition=1;
@@ -192,10 +177,10 @@ public class Robot extends IterativeRobot {
 		{
 			camYPosition=-1;
 		}
-		//drives.ArcadeDrive(lowPassFilteredSpeed, oi.controller1.getX(Hand.kLeft));	//drives with lowPassFilter
-		drives.ArcadeDrive(oi.controller1.getY(Hand.kLeft), oi.controller1.getX(Hand.kLeft));
-		tower.Move(oi.controller1.getRawAxis(RobotMap.xBoxRightY));
-		camServoX.set(camXPosition);
+		SmartDashboard.putNumber("CamX", camXPosition);
+		SmartDashboard.putNumber("CamY", camYPosition);		
+				
+		camServoX.set(-camXPosition);
     	camServoY.set(camYPosition);
 	}
 
